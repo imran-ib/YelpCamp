@@ -1,0 +1,24 @@
+{
+  "name": "yalpcamp",
+  "version": "1.0.0",
+  "description": "yelp camp is afull stack application with bootstrap nodejs express and mongodb. this is code along version",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imran-ib/YelpCamp.git"
+  },
+  "keywords": [
+    "Yalp",
+    "Camp",
+    "camping"
+  ],
+  "author": "Imran Irshad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/imran-ib/YelpCamp/issues"
+  },
+  "homepage": "https://github.com/imran-ib/YelpCamp#readme"
+}

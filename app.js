@@ -27,20 +27,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ========================================
 var campgroundSchema = new mongoose.Schema({
     name : String,
-    image : String
+    image : String,
+    description : String,
+    created :Date
 });
 var Campground = mongoose.model("Campground" , campgroundSchema);
 
 // Campground.create({
 //         name : "fire_flame" ,
-//         image : "https://cdn.pixabay.com/photo/2016/11/29/04/17/bonfire-1867275_960_720.jpg"
+//         image : "https://cdn.pixabay.com/photo/2016/11/29/04/17/bonfire-1867275_960_720.jpg",
+//     description : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aliquam aliquid autem commodi, corporis cupiditate ducimus fugiat ipsam itaque iusto magni perspiciatis placeat quaerat quod rerum ullam veniam vitae, voluptate!"
 //
 // } , function (err , campground) {
 //     if (err) throw err;
 //     else{console.log(campground)}
 // });
 // ========================================
-//    Routes
+//   Index Routes
 // ========================================
 
 app.get('/' , function (req , res ) {
@@ -54,7 +57,7 @@ app.get('/campgrounds' , function (req,res) {
     // Get All Campground from DB
     Campground.find({} , function (err , campgrounds) {
        if (err) throw err;
-        res.render('campgrounds' , {campgrounds : campgrounds});
+        res.render('index' , {campgrounds : campgrounds});
     });
 });
 
@@ -64,10 +67,14 @@ app.post('/campgrounds' , function (req , res) {
    //get data from form
     var name = req.body.name;
     var image = req.body.image;
-    var newCampgrpund = { name : name , image : image};
-    campgrounds.push(newCampgrpund);
-   //redirect
-    res.redirect('/campgrounds')
+    var des = req.body.description;
+    var newCampground = { name : name , image : image , description: des};
+    Campground.create(newCampground , function (err , newlyCreated) {
+       if(err) throw err;
+       else{
+           res.redirect('/campgrounds')
+       }
+    });
 });
 
 // ========================================
@@ -78,9 +85,16 @@ app.get('/campgrounds/new' , function (req,res) {
 });
 
 // ========================================
-//    Routes
+//   SHOW Route
 // ========================================
-
+app.get('/campgrounds/:id' , function (req ,res) {
+    Campground.findById(req.params.id , function (err , foundCamp) {
+    if (err) throw err;
+    else {
+        res.render('show' , {campground : foundCamp});
+    }
+    });
+});
 // ========================================
 //    Routes
 // ========================================

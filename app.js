@@ -3,14 +3,17 @@ var path            = require('path');
 var favicon         = require('serve-favicon');
 var logger          = require('morgan');
 var cookieParser    = require('cookie-parser');
-var bodyParser       = require('body-parser');
+var bodyParser      = require('body-parser');
 var mongoose        = require('mongoose');
-
-var app = express();
+var app             = express();
+var Campground      = require('./models/campground');
+var Comment         = require('./models/comment');
+var seedDB          = require('./seeds');
+seedDB();
 
 //mongoose connect
 mongoose.connect("mongodb://localhost/yelp_camp");
-
+mongoose.Promise = global.Promise;
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -19,29 +22,13 @@ app.set('view engine', 'ejs');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 // ========================================
 //      Schema
 // ========================================
-var campgroundSchema = new mongoose.Schema({
-    name : String,
-    image : String,
-    description : String,
-    created :Date
-});
-var Campground = mongoose.model("Campground" , campgroundSchema);
 
-// Campground.create({
-//         name : "fire_flame" ,
-//         image : "https://cdn.pixabay.com/photo/2016/11/29/04/17/bonfire-1867275_960_720.jpg",
-//     description : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ab aliquam aliquid autem commodi, corporis cupiditate ducimus fugiat ipsam itaque iusto magni perspiciatis placeat quaerat quod rerum ullam veniam vitae, voluptate!"
-//
-// } , function (err , campground) {
-//     if (err) throw err;
-//     else{console.log(campground)}
-// });
 // ========================================
 //   Index Routes
 // ========================================
@@ -57,7 +44,7 @@ app.get('/campgrounds' , function (req,res) {
     // Get All Campground from DB
     Campground.find({} , function (err , campgrounds) {
        if (err) throw err;
-        res.render('index' , {campgrounds : campgrounds});
+        res.render('campground/index' , {campgrounds : campgrounds});
     });
 });
 
@@ -81,21 +68,51 @@ app.post('/campgrounds' , function (req , res) {
 //    New Route
 // ========================================
 app.get('/campgrounds/new' , function (req,res) {
-   res.render('new')
+   res.render('campground/new')
 });
 
 // ========================================
 //   SHOW Route
 // ========================================
 app.get('/campgrounds/:id' , function (req ,res) {
-    Campground.findById(req.params.id , function (err , foundCamp) {
+    Campground.findById(req.params.id).populate("comments").exec( function (err , foundCamp) {
     if (err) throw err;
     else {
-        res.render('show' , {campground : foundCamp});
+        res.render('campground/show' , {campground : foundCamp});
     }
     });
 });
 // ========================================
+//   Comments Routes
+// ========================================
+app.get('/campgrounds/:id/comments/new' , function (req , res) {
+    Campground.findById(req.params.id , function (err , campground) {
+       if(err) throw err;
+       else {
+           res.render('comments/new', {campground : campground})
+       }
+    });
+});
+
+app.post('/campgrounds/:id/comments', function (req , res) {
+    Campground.findById(req.params.id , function (err , campground) {
+           if (err) {
+               console.log(err);
+               res.redirect("/campgrounds")
+           }
+           else{
+               Comment.create(req.body.comment , function (err , comment) {
+                  if (err) throw err;
+                  else {
+                      campground.comments.push(comment);
+                      campground.save();
+                      res.redirect('/campgrounds/' + campground._id);
+                  }
+               });
+           }
+       })
+ });
+// ========================================
 //    Routes
 // ========================================
 
@@ -107,13 +124,10 @@ app.get('/campgrounds/:id' , function (req ,res) {
 //    Routes
 // ========================================
 
-// ========================================
-//    Routes
-// ========================================
+
 
 
 // SERVER
-
 app.listen(3000 , function(req , res){
   console.log("Sever Is Ruing on Port 3000")
 });

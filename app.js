@@ -128,7 +128,7 @@ app.post('/campgrounds/:id/comments', function (req , res) {
 
 
 // SERVER
-app.listen(3000 , function(req , res){
-  console.log("Sever Is Ruing on Port 3000")
+app.listen(8080 , function(req , res){
+  console.log("Sever Is Ruing on Port 8080")
 });
 module.exports = app;

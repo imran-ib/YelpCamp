@@ -7,6 +7,7 @@ var bodyParser      = require('body-parser');
 var mongoose        = require('mongoose');
 var passport        = require('passport');
 var localStrategy   = require('passport-local');
+var methodOverride  = require('method-override');
 var app             = express();
 
 var Campground      = require('./models/campground');
@@ -51,6 +52,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(methodOverride("_method"));
 
 //pass currentUser to every single route
 app.use(function (req , res, next) {

@@ -8,6 +8,7 @@ var mongoose        = require('mongoose');
 var passport        = require('passport');
 var localStrategy   = require('passport-local');
 var methodOverride  = require('method-override');
+var flash           = require('connect-flash');
 var app             = express();
 
 var Campground      = require('./models/campground');
@@ -53,10 +54,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride("_method"));
+app.use(flash());
 
 //pass currentUser to every single route
 app.use(function (req , res, next) {
    res.locals.currentUser = req.user;
+   res.locals.error = req.flash("error");
+   res.locals.success = req.flash("success");
    next();
 });
 
@@ -72,6 +76,6 @@ app.get('/' , function (req , res ) {
 });
 
 // SERVER
-app.listen(8080 , function(req , res){
-  console.log("Sever Is Ruing on Port 8080")
+app.listen(3000 , function(req , res){
+  console.log("Sever Is Ruing on Port 3000")
 });
